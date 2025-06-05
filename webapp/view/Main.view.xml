@@ -7,7 +7,7 @@
                 <SearchField id="searchField" visible="{viewModel>/searchVisible}" liveChange=".onLiveSearch" width="50%" placeholder="{i18n>searchPlaceholder}" />
                 <CheckBox id="includeSupplier" text="Include Supplier" select=".onSupplierToggle" selected="{viewModel>/includeSupplier}" />
                 <Button id="idBtnRefresh" press="onPressRefresh" text="Refresh"/>
-                <Button id="createButton" text="{i18n>createButton}" press=".onCreateProduct" />
+                <Button id="createNewProduct" text="{i18n>createNewProduct}" press=".onCreateProduct" />
             </OverflowToolbar>
         </subHeader>
         <HBox id="_IDGenHBox1">
@@ -36,22 +36,27 @@
                         <Text id="_IDGenText4" text="{i18n>productSupplier}" />
                     </Column>
                     <Column id="categoryColumn">
-                        <Text id="_IDGenText5" text="{i18n>Category}" />
+                        <Text id="_IDGenText5" text="{i18n>ReleaseDate}" />
                     </Column>
                     <Column id="actionsColumn" width="5em">
                         <Text id="_IDGenText6" text="{i18n>Actions}" />
                     </Column>
                 </columns>
                 <items>
-                    <ColumnListItem id="_IDGenColumnListItem1" press=".onProductClick" type="Navigation">
+                    <ColumnListItem id="_IDGenColumnListItem1" type="Navigation">
                         <cells>
                             <CheckBox id="_IDGenCheckBox" selected="{path: 'ProductID', formatter: '.isSelected'}" select=".onCheckboxSelect" />
                             <ObjectIdentifier id="_IDGenObjectIdentifier" title="{ProductID}" text="{Name}" />
                             <Text id="_IDGenText7" text="{Description}" />
                             <Text id="_IDGenText8" text="{Price}" />
                             <Text id="_IDGenText9" text="{SupplierName}" />
-                            <Text id="_IDGenText10" text="{Category}" />
-                            <Button id="btnDeleteProd" icon="sap-icon://delete" press=".onDeleteProduct" />
+                            <Text id="_IDGenText10" text="{CreatedAt}" />
+                            <HBox id="actionButtonGroup" justifyContent="End" alignItems="Center">
+                                <Button id="btnViewProd" icon="sap-icon://show" type="Transparent" press=".onProductClick" tooltip="View" />
+                                <Button id="btnEditProd" icon="sap-icon://edit" type="Transparent" press=".onEditProduct" tooltip="Edit" />
+                                <Button id="btnDeleteProd" icon="sap-icon://delete" type="Transparent" press=".onPressDeleteProduct" tooltip="Delete" />
+                            </HBox>
+
                         </cells>
                     </ColumnListItem>
                 </items>

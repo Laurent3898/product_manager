@@ -227,44 +227,83 @@ sap.ui.define(
         },
 
         onCreateProduct: function () {
-          if (!this._oCreateDialog) {
-            this._oCreateDialog = sap.ui.xmlfragment(
-              "com.market.m.productmanager.view.fragment.CreateProduct",
+          if (!this._oProductDialog) {
+            this._oProductDialog = sap.ui.xmlfragment(
+              "com.market.m.productmanager.view.fragment.ProductDialog",
               this
             );
-            this.getView().addDependent(this._oCreateDialog);
+            this.getView().addDependent(this._oProductDialog);
           }
           var oModel = new sap.ui.model.json.JSONModel({
-            isEditModel: false,
+            isEditMode: false,
             ProductID: "",
             Name: "",
             Price: "",
             CurrencyCode: "USD",
+            Description: "",
+            Category: "",
           });
-          this._oCreateDialog.setModel(oModel);
-          this._oCreateDialog.open();
+          this._oProductDialog.setModel(oModel);
+          this._oProductDialog.open();
         },
+
+        onEditProduct: function (oEvent) {
+          const oButton = oEvent.getSource();
+          const oContext = oButton.getBindingContext();
+          if (oContext) {
+            if (!this._oProductDialog) {
+              this._oProductDialog = sap.ui.xmlfragment(
+                "com.market.m.productmanager.view.fragment.ProductDialog",
+                this
+              );
+              this.getView().addDependent(this._oProductDialog);
+            }
+            const oData = oContext.getObject();
+            oData.isEditMode = true;
+            oData.sPath = oContext.getPath(); // Store path for update
+            const oModel = new sap.ui.model.json.JSONModel(oData);
+            this._oProductDialog.setModel(oModel);
+            this._oProductDialog.open();
+          }
+        },
+
         onSaveProduct: function () {
-          var oDialogModel = this._oCreateDialog.getModel();
+          var oDialogModel = this._oProductDialog.getModel();
           var oData = oDialogModel.getData();
-          if (!oData.isEditMode) {
-            this.getView()
-              .getModel()
-              .create("/ProductSet", oData, {
-                success: function () {
-                  MessageToast.show("Product created successfully");
-                  this._oCreateDialog.close();
-                  this.byId("productsTable").getBinding("items").refresh();
-                }.bind(this),
-                error: function () {
-                  MessageToast.show("Error creating product");
-                },
-              });
+          var oModel = this.getModel();
+
+          if (oData.isEditMode) {
+            var sPath = oData.sPath;
+            oModel.update(sPath, oData, {
+              success: function () {
+                MessageToast.show("Product updated successfully");
+                this._oProductDialog.close();
+                this.byId("productsTable").getBinding("items").refresh();
+              }.bind(this),
+              error: function (oError) {
+                MessageToast.show("Error updating product");
+                console.error("Update error:", oError);
+              },
+            });
+          } else {
+            oModel.create("/ProductSet", oData, {
+              success: function () {
+                MessageToast.show("Product created successfully");
+                this._oProductDialog.close();
+                this.byId("productsTable").getBinding("items").refresh();
+              }.bind(this),
+              error: function (oError) {
+                MessageToast.show("Error creating product");
+                console.error("Create error:", oError);
+              },
+            });
           }
         },
 
         onCloseDialog: function () {
-          this._oCreateDialog.close();
+          if (this._oProductDialog) {
+            this._oProductDialog.close();
+          }
         },
 
         onProductPress: function (oEvent) {

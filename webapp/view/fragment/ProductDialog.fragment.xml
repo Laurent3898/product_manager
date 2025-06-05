@@ -1,24 +1,40 @@
 <core:FragmentDefinition 
     xmlns="sap.m" 
-    xmlns:core="sap.ui.core">
-    <Dialog id="_IDGenDialog" title="{= ${/isEditMode} ? 'Edit Product' : 'Create Product'}">
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form">
+    <Dialog id="_IDGenDialog" 
+            title="{= ${/isEditMode} ? ${i18n>editProductTitle} : ${i18n>createProductTitle}}" 
+            contentWidth="30rem" 
+            ariaLabelledBy="_IDGenDialogTitle">
         <content>
-            <VBox id="_IDGenVBox">
-                <Label id="_IDGenLabel7" text="{i18n>productIdLabel}" />
-                <Input id="_IDGenInput" value="{/ProductID}" enabled="{= !${/isEditMode}}" />
-                <Label id="_IDGenLabel8" text="{i18n>productNameLabel}" />
-                <Input id="_IDGenInput1" value="{/Name}" />
-                <Label id="_IDGenLabel9" text="{i18n>priceLabel}" />
-                <Input id="_IDGenInput2" value="{/Price}" />
-                <Label id="_IDGenLabel10" text="{i18n>currencyLabel}" />a
-                <Input id="_IDGenInput3" value="{/CurrencyCode}" />
-            </VBox>
+            <layout:SimpleForm id="_IDGenSimpleForm" 
+                              editable="true" 
+                              layout="ResponsiveGridLayout" 
+                              labelSpanL="4" 
+                              labelSpanM="4" 
+                              columnsL="1" 
+                              columnsM="1">
+                <layout:content>
+                    <Label id="_IDGenLabel7" text="{i18n>productIdLabel}" required="true" labelFor="_IDGenInput"/>
+                    <Input id="_IDGenInput" value="{/ProductID}" enabled="{= !${/isEditMode}}" />
+                    <Label id="_IDGenLabel8" text="{i18n>productNameLabel}" required="true" labelFor="_IDGenInput1"/>
+                    <Input id="_IDGenInput1" value="{/Name}" />
+                    <Label id="_IDGenLabel9" text="{i18n>priceLabel}" required="true" labelFor="_IDGenInput2"/>
+                    <Input id="_IDGenInput2" value="{/Price}" type="Number"/>
+                    <Label id="_IDGenLabel11" text="{i18n>currencyLabel}" labelFor="_IDGenInput4"/>
+                    <Input id="_IDGenInput4" value="{/CurrencyCode}"/>
+                    <Label id="_IDGenLabel17" text="{i18n>descriptionLabel}" labelFor="_IDGenInput5"/>
+                    <Input id="_IDGenInput5" value="{/Description}"/>
+                    <Label id="_IDGenLabel18" text="{i18n>categoryLabel}" labelFor="_IDGenInput3"/>
+                    <Input id="_IDGenInput3" value="{/Category}"/>
+                </layout:content>
+            </layout:SimpleForm>
         </content>
         <beginButton>
-            <Button id="_IDGenButton3" text="{i18n>saveButton}" press=".onSaveProduct" />
+            <Button id="_IDGenButton3" text="{i18n>saveButton}" press=".onSaveProduct" type="Emphasized"/>
         </beginButton>
         <endButton>
-            <Button id="_IDGenButton5" text="{i18n>cancelButton}" press=".onCloseDialog" />
+            <Button id="_IDGenButton5" text="{i18n>cancelButton}" press=".onCloseDialog"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
