@@ -1,0 +1,69 @@
+<mvc:View controllerName="com.market.m.productmanager.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <subHeader>
+            <OverflowToolbar id="_IDGenOverflowToolbar">
+                <SearchField id="searchField" visible="{viewModel>/searchVisible}" liveChange=".onLiveSearch" width="50%" placeholder="{i18n>searchPlaceholder}" />
+                <CheckBox id="includeSupplier" text="Include Supplier" select=".onSupplierToggle" selected="{viewModel>/includeSupplier}" />
+                <Button id="idBtnRefresh" press="onPressRefresh" text="Refresh"/>
+                <Button id="createButton" text="{i18n>createButton}" press=".onCreateProduct" />
+            </OverflowToolbar>
+        </subHeader>
+        <HBox id="_IDGenHBox1">
+            <Switch id="_IDGenSwitch1" state="{viewModel>/searchVisible}">
+                <layoutData>
+                    <FlexItemData id="_IDGenFlexItemData" growFactor="1" />
+                </layoutData>
+            </Switch>
+        </HBox>
+        <content>
+            <Table id="productsTable" items="{/ProductSet}">
+                <columns>
+                    <Column id="checkboxColumn" width="5em">
+                        <Text id="_IDGenText" text="#" />
+                    </Column>
+                    <Column id="nameColumn">
+                        <Text id="_IDGenText1" text="{i18n>productNameID}" />
+                    </Column>
+                    <Column id="descriptionColumn" visible="{= !${device>/system/phone} || !${viewModel>/isPortrait} }" >
+                        <Text id="_IDGenText2" text="{i18n>productDescription}" />
+                    </Column>
+                    <Column id="priceColumn">
+                        <Text id="_IDGenText3" text="{i18n>productPrice}" />
+                    </Column>
+                    <Column id="supplierColumn" visible="{viewModel>/includeSupplier}">
+                        <Text id="_IDGenText4" text="{i18n>productSupplier}" />
+                    </Column>
+                    <Column id="categoryColumn">
+                        <Text id="_IDGenText5" text="{i18n>Category}" />
+                    </Column>
+                    <Column id="actionsColumn" width="5em">
+                        <Text id="_IDGenText6" text="{i18n>Actions}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem id="_IDGenColumnListItem1" press=".onProductClick" type="Navigation">
+                        <cells>
+                            <CheckBox id="_IDGenCheckBox" selected="{path: 'ProductID', formatter: '.isSelected'}" select=".onCheckboxSelect" />
+                            <ObjectIdentifier id="_IDGenObjectIdentifier" title="{ProductID}" text="{Name}" />
+                            <Text id="_IDGenText7" text="{Description}" />
+                            <Text id="_IDGenText8" text="{Price}" />
+                            <Text id="_IDGenText9" text="{SupplierName}" />
+                            <Text id="_IDGenText10" text="{Category}" />
+                            <Button id="btnDeleteProd" icon="sap-icon://delete" press=".onDeleteProduct" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+            <HBox id="paginationBox" alignItems="Center" justifyContent="SpaceBetween">
+                <Text id="rangeText" text="{viewModel>/rangeText}" />
+                <HBox id="_IDGenHBox">
+                    <Button id="prevButton" text="Previous" press=".onPreviousPage" enabled="{viewModel>/prevEnabled}" />
+                    <Text id="pageText" text="Page {viewModel>/currentPage} of {viewModel>/totalPages}" />
+                    <Button id="nextButton" text="Next" press=".onNextPage" enabled="{viewModel>/nextEnabled}" />
+                </HBox>
+            </HBox>
+        </content>
+    </Page>
+</mvc:View>

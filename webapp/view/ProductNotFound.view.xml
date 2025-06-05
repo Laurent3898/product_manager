@@ -1,0 +1,10 @@
+<mvc:View controllerName="com.market.m.productmanager.controller.ProductNotFound"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="pageNotFound" title="{i18n>productNotFoundTitle}">
+        <content>
+            <Text id="_IDGenText23" text="{i18n>productNotFoundText}" />
+            <Button id="_IDGenButton" text="{i18n>backToHome}" press=".onBackToHome" />
+        </content>
+    </Page>
+</mvc:View>
