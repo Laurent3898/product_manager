@@ -15,6 +15,6 @@
         <Label id="_IDGenLabel5" text="Category" />
         <Text id="_IDGenText14" text="{Category}" />
         <Label id="_IDGenLabel6" text="{i18n>ReleaseDate}" />
-        <!-- <Text id="_IDGenText15" text="{path: 'CreatedAt', formatter: '.formatter.formatReleaseDate'}" /> -->
+        <Text id="_IDGenText15" text="{path: 'CreatedAt', formatter: '.formatter.formatReleaseDate'}" />
     </layout:SimpleForm>
 </core:FragmentDefinition>

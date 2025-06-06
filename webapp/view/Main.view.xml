@@ -7,7 +7,7 @@
                 <SearchField id="searchField" visible="{viewModel>/searchVisible}" liveChange=".onLiveSearch" width="50%" placeholder="{i18n>searchPlaceholder}" />
                 <CheckBox id="includeSupplier" text="Include Supplier" select=".onSupplierToggle" selected="{viewModel>/includeSupplier}" />
                 <Button id="idBtnRefresh" press="onPressRefresh" text="Refresh"/>
-                <Button id="createNewProduct" text="{i18n>createNewProduct}" press=".onCreateProduct" />
+                <Button id="createNewProduct"  type="Emphasized" icon="sap-icon://add"  text="{i18n>createNewProduct}" press=".onCreateProduct" />
             </OverflowToolbar>
         </subHeader>
         <HBox id="_IDGenHBox1">
@@ -50,7 +50,7 @@
                             <Text id="_IDGenText7" text="{Description}" />
                             <Text id="_IDGenText8" text="{Price}" />
                             <Text id="_IDGenText9" text="{SupplierName}" />
-                            <Text id="_IDGenText10" text="{CreatedAt}" />
+                            <Text id="_IDGenText10" text="{path: 'CreatedAt', formatter: '.formatter.formatReleaseDate'}" />
                             <HBox id="actionButtonGroup" justifyContent="End" alignItems="Center">
                                 <Button id="btnViewProd" icon="sap-icon://show" type="Transparent" press=".onProductClick" tooltip="View" />
                                 <Button id="btnEditProd" icon="sap-icon://edit" type="Transparent" press=".onEditProduct" tooltip="Edit" />
