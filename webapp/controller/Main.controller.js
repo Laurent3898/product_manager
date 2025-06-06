@@ -6,7 +6,6 @@ sap.ui.define(
     "sap/ui/model/FilterOperator",
     "com/market/m/productmanager/model/formatter",
     "sap/ui/Device",
-    "sap/ui/core/Fragment",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
   ],
@@ -17,7 +16,6 @@ sap.ui.define(
     FilterOperator,
     formatter,
     Device,
-    Fragment,
     MessageToast,
     MessageBox
   ) {
@@ -174,6 +172,12 @@ sap.ui.define(
           Device.orientation.detachHandler(this.onOrientationChange, this);
         },
 
+        onPressRefresh: function () {
+          const oTable = this.byId("productsTable");
+          oTable.setBusy(true);
+          this.rebindTable(this.getCurrentFilters());
+        },
+
         onProductClick: function (oEvent) {
           const oContext = oEvent.getSource().getBindingContext();
           const sProductId = oContext.getProperty("ProductID");
@@ -182,30 +186,30 @@ sap.ui.define(
           });
         },
 
-        onPressRefresh: function () {
-          const oTable = this.byId("productsTable");
-          oTable.setBusy(true);
-          this.rebindTable(this.getCurrentFilters());
-        },
-
         onPressDeleteProduct: function (oEvent) {
           const oButton = oEvent.getSource();
           const oContext = oButton.getBindingContext();
           if (oContext) {
-            Fragment.load({
-              id: "deleteProductDialog",
-              name: "com.market.m.productmanager.view.fragment.ConfirmDeleteProduct",
-              controller: this,
-            }).then((oDialog) => {
-              this.getView().addDependent(oDialog);
-              oDialog.setBindingContext(oContext);
-              oDialog.open();
-            });
+            if (!this._oDeleteDialog) {
+              sap.ui.core.Fragment.load({
+                id: "deleteProductDialog",
+                name: "com.market.m.productmanager.view.fragment.ConfirmDeleteProduct",
+                controller: this,
+              }).then((oDialog) => {
+                this._oDeleteDialog = oDialog;
+                this.getView().addDependent(oDialog);
+                oDialog.setBindingContext(oContext);
+                oDialog.open();
+              });
+            } else {
+              this._oDeleteDialog.setBindingContext(oContext);
+              this._oDeleteDialog.open();
+            }
           }
         },
 
         onConfirmDeleteProduct: function (oEvent) {
-          const oDialog = oEvent.getSource();
+          const oDialog = this._oDeleteDialog;
           const oContext = oDialog.getBindingContext();
           if (oContext) {
             const sPath = oContext.getPath();
@@ -213,105 +217,160 @@ sap.ui.define(
               success: () => {
                 MessageToast.show("Product deleted successfully");
                 this.rebindTable(this.getCurrentFilters());
+                oDialog.close();
               },
               error: (oError) => {
                 MessageBox.error("Error deleting product: " + oError.message);
               },
             });
           }
-          oDialog.close();
         },
 
-        onCancelDeleteProduct: function (oEvent) {
-          oEvent.getSource().close();
+        onCancelDeleteProduct: function () {
+          this._oDeleteDialog.close();
+        },
+
+        _openProductDialog: function (bIsEditMode, oContext) {
+          const oDialog = this.getProductDialog();
+          let oData;
+          if (bIsEditMode) {
+            oData = oContext.getObject();
+            oData.isEditMode = true;
+            oData.sPath = oContext.getPath();
+          } else {
+            oData = {
+              isEditMode: false,
+              ProductID: "",
+              TypeCode: "",
+              Category: "",
+              Name: "",
+              SupplierID: "",
+              TaxTarifCode: 0,
+              MeasureUnit: "",
+              CurrencyCode: "USD",
+              Description: "",
+              Price: "",
+            };
+          }
+          const oModel = new JSONModel(oData);
+          oDialog.setModel(oModel);
+          oDialog.open();
         },
 
         onCreateProduct: function () {
-          if (!this._oProductDialog) {
-            this._oProductDialog = sap.ui.xmlfragment(
-              "com.market.m.productmanager.view.fragment.ProductDialog",
-              this
-            );
-            this.getView().addDependent(this._oProductDialog);
-          }
-          var oModel = new sap.ui.model.json.JSONModel({
-            isEditMode: false,
-            ProductID: "",
-            Name: "",
-            Price: "",
-            CurrencyCode: "USD",
-            Description: "",
-            Category: "",
-          });
-          this._oProductDialog.setModel(oModel);
-          this._oProductDialog.open();
+          this._openProductDialog(false);
         },
 
         onEditProduct: function (oEvent) {
           const oButton = oEvent.getSource();
           const oContext = oButton.getBindingContext();
           if (oContext) {
-            if (!this._oProductDialog) {
-              this._oProductDialog = sap.ui.xmlfragment(
-                "com.market.m.productmanager.view.fragment.ProductDialog",
-                this
-              );
-              this.getView().addDependent(this._oProductDialog);
-            }
-            const oData = oContext.getObject();
-            oData.isEditMode = true;
-            oData.sPath = oContext.getPath(); // Store path for update
-            const oModel = new sap.ui.model.json.JSONModel(oData);
-            this._oProductDialog.setModel(oModel);
-            this._oProductDialog.open();
+            this._openProductDialog(true, oContext);
           }
         },
 
         onSaveProduct: function () {
-          var oDialogModel = this._oProductDialog.getModel();
-          var oData = oDialogModel.getData();
-          var oModel = this.getModel();
+          const oDialog = this.getProductDialog();
+          const oDialogModel = oDialog.getModel();
+          const oData = oDialogModel.getData();
+          const oModel = this.getModel();
 
-          if (oData.isEditMode) {
-            var sPath = oData.sPath;
-            oModel.update(sPath, oData, {
-              success: function () {
-                MessageToast.show("Product updated successfully");
-                this._oProductDialog.close();
-                this.byId("productsTable").getBinding("items").refresh();
-              }.bind(this),
-              error: function (oError) {
-                MessageToast.show("Error updating product");
-                console.error("Update error:", oError);
-              },
-            });
-          } else {
-            oModel.create("/ProductSet", oData, {
-              success: function () {
-                MessageToast.show("Product created successfully");
-                this._oProductDialog.close();
-                this.byId("productsTable").getBinding("items").refresh();
-              }.bind(this),
-              error: function (oError) {
-                MessageToast.show("Error creating product");
-                console.error("Create error:", oError);
-              },
-            });
+          // Validate all mandatory fields based on the dialog
+          const mandatoryFields = [
+            "ProductID",
+            "Name",
+            "Price",
+            "CurrencyCode",
+            "Category",
+            "TypeCode",
+            "SupplierID",
+            "TaxTarifCode",
+            "MeasureUnit",
+          ];
+          const isValid = mandatoryFields.every(
+            (field) => oData[field] != null && oData[field] !== ""
+          );
+          if (!isValid) {
+            MessageBox.error("Please fill in all mandatory fields.");
+            return;
           }
+
+          // Define the fields that belong to the Product entity
+          const productFields = [
+            "ProductID",
+            "Name",
+            "Price",
+            "CurrencyCode",
+            "Description",
+            "Category",
+            "TypeCode",
+            "SupplierID",
+            "TaxTarifCode",
+            "MeasureUnit",
+          ];
+
+          // Create a new object with only the Product entity fields
+          const oDataToSend = {};
+          productFields.forEach((field) => {
+            if (oData.hasOwnProperty(field)) {
+              oDataToSend[field] = oData[field];
+            }
+          });
+
+          const operation = oData.isEditMode ? "update" : "create";
+          const promise = oData.isEditMode
+            ? this._updateProduct(oModel, oData.sPath, oDataToSend)
+            : this._createProduct(oModel, oDataToSend);
+
+          promise
+            .then(() => {
+              MessageToast.show(`Product ${operation}d successfully`);
+              oDialog.close();
+              this.byId("productsTable").getBinding("items").refresh();
+            })
+            .catch((oError) => {
+              let sMessage = `Error ${operation}ing product`;
+              if (oError.statusCode) {
+                sMessage += `: ${oError.statusCode} - ${oError.statusText}`;
+              }
+              if (oError.responseText) {
+                try {
+                  const oResponse = JSON.parse(oError.responseText);
+                  sMessage += `\nDetails: ${oResponse.error.message.value}`;
+                } catch (e) {
+                  sMessage += `\nDetails: ${oError.responseText}`;
+                }
+              }
+              MessageBox.error(sMessage);
+            });
+        },
+
+        _createProduct: function (oModel, oData) {
+          return new Promise((resolve, reject) => {
+            oModel.create("/ProductSet", oData, {
+              success: resolve,
+              error: reject,
+            });
+          });
+        },
+
+        _updateProduct: function (oModel, sPath, oData) {
+          return new Promise((resolve, reject) => {
+            oModel.update(sPath, oData, {
+              success: resolve,
+              error: reject,
+            });
+          });
         },
 
         onCloseDialog: function () {
-          if (this._oProductDialog) {
-            this._oProductDialog.close();
-          }
+          this.getProductDialog().close();
         },
 
         onProductPress: function (oEvent) {
-          var oItem = oEvent.getSource();
-          var sProductId = oItem.getBindingContext().getProperty("ProductID");
-          this.getOwnerComponent()
-            .getRouter()
-            .navTo("RouteProduct", { productId: sProductId });
+          const oItem = oEvent.getSource();
+          const sProductId = oItem.getBindingContext().getProperty("ProductID");
+          this.getRouter().navTo("RouteProduct", { productId: sProductId });
         },
       }
     );

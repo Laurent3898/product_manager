@@ -3,8 +3,7 @@
     xmlns:core="sap.ui.core">
     <m:Dialog id="confirmDeleteProductDialog1" title="{i18n>confirmDeleteProductTitle}">
         <m:content>
-            <m:Text id="_IDGenText27" text="{i18n>confirmDeleteProductText} {ProductID} ?" />
-            <m:Text id="_IDGenText28" text="{Name}" />
+            <m:Text id="_IDGenText27" text="{i18n>confirmDeleteProductText} {ProductID} - {Name} ?" />
         </m:content>
         <m:beginButton>
             <m:Button id="_IDGenButton1" text="{i18n>confirmDeleteProductYes}" press="onConfirmDeleteProduct" />

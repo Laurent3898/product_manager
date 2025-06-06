@@ -38,6 +38,21 @@ sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
       getRouter: function () {
         return this.getOwnerComponent().getRouter();
       },
+
+      /**
+       * Get or create the product dialog
+       * @returns {sap.ui.core.Control} The product dialog instance
+       */
+      getProductDialog: function () {
+        if (!this._oProductDialog) {
+          this._oProductDialog = sap.ui.xmlfragment(
+            "com.market.m.productmanager.view.fragment.ProductDialog",
+            this
+          );
+          this.getView().addDependent(this._oProductDialog);
+        }
+        return this._oProductDialog;
+      },
     }
   );
 });
