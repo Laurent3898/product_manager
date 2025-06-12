@@ -25,7 +25,6 @@ sap.ui.define(
       "com.market.m.productmanager.controller.Main",
       {
         formatter: formatter,
-        ITEMS_PER_PAGE: 5,
 
         onInit: function () {
           this.iSkip = 0;
@@ -60,39 +59,22 @@ sap.ui.define(
             template: oTemplate,
             parameters: {
               expand: "ToSupplier",
-              top: this.ITEMS_PER_PAGE,
-              skip: this.iSkip,
-              $inlinecount: "allpages",
             },
             filters: aFilters,
             events: {
               dataRequested: () => oTable.setBusy(true),
-              dataReceived: (oData) => {
+              dataReceived: () => {
                 oTable.setBusy(false);
-                this._updatePagination(oData);
+                const oBinding = oTable.getBinding("items");
+                if (oBinding) {
+                  this.oViewModel.setProperties({
+                    prevEnabled: this.iSkip > 0,
+                  });
+                } else {
+                  MessageBox.error("Error binding table data");
+                }
               },
             },
-          });
-        },
-
-        _updatePagination: function (oEvent) {
-          const oData = oEvent.getParameter("data");
-          if (!oData) {
-            MessageBox.error("Error loading data");
-            return;
-          }
-          const iTotalCount = parseInt(oData.__count, 10) || 0;
-          const iTotalPages = Math.ceil(iTotalCount / this.ITEMS_PER_PAGE) || 1;
-          const iCurrentPage = Math.floor(this.iSkip / this.ITEMS_PER_PAGE) + 1;
-          const iStart = this.iSkip + 1;
-          const iEnd = Math.min(this.iSkip + this.ITEMS_PER_PAGE, iTotalCount);
-
-          this.oViewModel.setProperties({
-            rangeText: `Displaying ${iStart}-${iEnd} of ${iTotalCount} items`,
-            currentPage: iCurrentPage,
-            totalPages: iTotalPages,
-            prevEnabled: this.iSkip > 0,
-            nextEnabled: this.iSkip + this.ITEMS_PER_PAGE < iTotalCount,
           });
         },
 
@@ -115,24 +97,13 @@ sap.ui.define(
             ? [
                 new Filter({
                   filters: [
-                    new Filter("Name", FilterOperator.Contains, sQuery),
-                    new Filter("Description", FilterOperator.Contains, sQuery),
+                    new Filter("ProductID", FilterOperator.Contains, sQuery),
                   ],
-                  and: false,
+                  and: false, // OR condition
                 }),
               ]
             : [];
           this.rebindTable(aFilters);
-        },
-
-        onNextPage: function () {
-          this.iSkip += this.ITEMS_PER_PAGE;
-          this.rebindTable(this.getCurrentFilters());
-        },
-
-        onPreviousPage: function () {
-          this.iSkip = Math.max(this.iSkip - this.ITEMS_PER_PAGE, 0);
-          this.rebindTable(this.getCurrentFilters());
         },
 
         getCurrentFilters: function () {
@@ -141,6 +112,7 @@ sap.ui.define(
             ? [
                 new Filter({
                   filters: [
+                    new Filter("ProductID", FilterOperator.Contains, sQuery),
                     new Filter("Name", FilterOperator.Contains, sQuery),
                     new Filter("Description", FilterOperator.Contains, sQuery),
                   ],
@@ -230,8 +202,35 @@ sap.ui.define(
           this._oDeleteDialog.close();
         },
 
+        generateProductID: function () {
+          const oModel = this.getModel();
+          return new Promise((resolve, reject) => {
+            oModel.read("/ProductSet", {
+              success: (oData) => {
+                const aProducts = oData.results;
+                let iMaxId = 0;
+                aProducts.forEach((oProduct) => {
+                  const sId = oProduct.ProductID;
+                  if (sId.startsWith("RLJ-")) {
+                    const iId = parseInt(sId.split("-")[1], 10);
+                    if (iId > iMaxId) {
+                      iMaxId = iId;
+                    }
+                  }
+                });
+                const sNewId = "RLJ-" + ("000" + (iMaxId + 1)).slice(-4);
+                resolve(sNewId);
+              },
+              error: (oError) => {
+                reject(oError);
+              },
+            });
+          });
+        },
+
+        // Dans Main.controller.js
         _openProductDialog: function (bIsEditMode, oContext) {
-          const oDialog = this.getProductDialog();
+          const oDialog = this.getProductDialog(); // Appel de la méthode du BaseController
           let oData;
           if (bIsEditMode) {
             oData = oContext.getObject();
@@ -247,18 +246,29 @@ sap.ui.define(
               SupplierID: "",
               TaxTarifCode: 0,
               MeasureUnit: "",
-              CurrencyCode: "USD",
+              CurrencyCode: "EUR",
               Description: "",
               Price: "",
+              CreatedAt: new Date(),
             };
           }
-          const oModel = new JSONModel(oData);
+          const oModel = new sap.ui.model.json.JSONModel(oData);
           oDialog.setModel(oModel);
           oDialog.open();
+          return oDialog; // Retourne le dialog
         },
 
         onCreateProduct: function () {
-          this._openProductDialog(false);
+          this.generateProductID()
+            .then((sNewId) => {
+              const oDialog = this._openProductDialog(false); // Récupère le dialog retourné
+              oDialog.getModel().setProperty("/ProductID", sNewId); // Définit l’ID généré
+            })
+            .catch((oError) => {
+              sap.m.MessageBox.error(
+                "Erreur lors de la génération de l’ID : " + oError.message
+              );
+            });
         },
 
         onEditProduct: function (oEvent) {
@@ -269,13 +279,13 @@ sap.ui.define(
           }
         },
 
+        // Dans Main.controller.js
         onSaveProduct: function () {
           const oDialog = this.getProductDialog();
           const oDialogModel = oDialog.getModel();
           const oData = oDialogModel.getData();
           const oModel = this.getModel();
 
-          // Validate all mandatory fields based on the dialog
           const mandatoryFields = [
             "ProductID",
             "Name",
@@ -287,15 +297,25 @@ sap.ui.define(
             "TaxTarifCode",
             "MeasureUnit",
           ];
+
+          // Convertir TaxTarifCode en nombre
+          oData.TaxTarifCode = parseInt(oData.TaxTarifCode, 10);
+
+          // Validation
           const isValid = mandatoryFields.every(
             (field) => oData[field] != null && oData[field] !== ""
           );
-          if (!isValid) {
-            MessageBox.error("Please fill in all mandatory fields.");
+          if (
+            !isValid ||
+            isNaN(oData.TaxTarifCode) ||
+            oData.TaxTarifCode <= 0
+          ) {
+            sap.m.MessageBox.error(
+              "Veuillez remplir tous les champs obligatoires et assurez-vous que TaxTarifCode est un entier positif."
+            );
             return;
           }
 
-          // Define the fields that belong to the Product entity
           const productFields = [
             "ProductID",
             "Name",
@@ -307,9 +327,9 @@ sap.ui.define(
             "SupplierID",
             "TaxTarifCode",
             "MeasureUnit",
+            "CreatedAt",
           ];
 
-          // Create a new object with only the Product entity fields
           const oDataToSend = {};
           productFields.forEach((field) => {
             if (oData.hasOwnProperty(field)) {
@@ -317,34 +337,33 @@ sap.ui.define(
             }
           });
 
-          const operation = oData.isEditMode ? "update" : "create";
+          const operation = oData.isEditMode ? "mise à jour" : "création";
           const promise = oData.isEditMode
             ? this._updateProduct(oModel, oData.sPath, oDataToSend)
             : this._createProduct(oModel, oDataToSend);
 
           promise
             .then(() => {
-              MessageToast.show(`Product ${operation}d successfully`);
+              sap.m.MessageToast.show(`Produit ${operation} avec succès`);
               oDialog.close();
               this.byId("productsTable").getBinding("items").refresh();
             })
             .catch((oError) => {
-              let sMessage = `Error ${operation}ing product`;
+              let sMessage = `Erreur lors de la ${operation} du produit`;
               if (oError.statusCode) {
                 sMessage += `: ${oError.statusCode} - ${oError.statusText}`;
               }
               if (oError.responseText) {
                 try {
                   const oResponse = JSON.parse(oError.responseText);
-                  sMessage += `\nDetails: ${oResponse.error.message.value}`;
+                  sMessage += `\nDétails : ${oResponse.error.message.value}`;
                 } catch (e) {
-                  sMessage += `\nDetails: ${oError.responseText}`;
+                  sMessage += `\nDétails : ${oError.responseText}`;
                 }
               }
-              MessageBox.error(sMessage);
+              sap.m.MessageBox.error(sMessage);
             });
         },
-
         _createProduct: function (oModel, oData) {
           return new Promise((resolve, reject) => {
             oModel.create("/ProductSet", oData, {

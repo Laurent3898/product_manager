@@ -5,7 +5,7 @@ sap.ui.define(
     "sap/m/MessageToast",
     "sap/m/MessageBox",
   ],
-  function (BaseController, formatter, MessageToast, MessageBox) {
+  function (BaseController, formatter) {
     "use strict";
 
     return BaseController.extend(

@@ -2,12 +2,11 @@
     xmlns="sap.m" 
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form">
-    <Dialog id="_IDGenDialog" 
+    <Dialog id="productDialog" 
             title="{= ${/isEditMode} ? ${i18n>editProductTitle} : ${i18n>createProductTitle}}" 
-            contentWidth="30rem" 
-            ariaLabelledBy="_IDGenDialogTitle">
+            contentWidth="30rem">
         <content>
-            <layout:SimpleForm id="_IDGenSimpleForm" 
+            <layout:SimpleForm id="productFormD" 
                               editable="true" 
                               layout="ResponsiveGridLayout" 
                               labelSpanL="4" 
@@ -15,43 +14,41 @@
                               columnsL="1" 
                               columnsM="1">
                 <layout:content>
-                    <Label id="_IDGenLabel8" text="{i18n>productIdLabel}" required="true" labelFor="_IDGenInput"/>
-                    <Input id="_IDGenInput" value="{/ProductID}" enabled="{= !${/isEditMode}}" />
-
-                    <Label id="_IDGenLabel9" text="{i18n>productNameLabel}" required="true" labelFor="_IDGenInput1"/>
-                    <Input id="_IDGenInput1" value="{/Name}" />
-
-                    <Label id="_IDGenLabel10" text="{i18n>priceLabel}" required="true" labelFor="_IDGenInput2"/>
-                    <Input id="_IDGenInput2" value="{/Price}" type="Number"/>
-
-                    <Label id="_IDGenLabel11" text="{i18n>currencyLabel}" labelFor="_IDGenInput4"/>
-                    <Input id="_IDGenInput4" value="{/CurrencyCode}"/>
-
-                    <Label id="_IDGenLabel17" text="{i18n>descriptionLabel}" labelFor="_IDGenInput5"/>
-                    <Input id="_IDGenInput5" value="{/Description}"/>
-
-                    <Label id="_IDGenLabel18" text="{i18n>categoryLabel}" labelFor="_IDGenInput3"/>
-                    <Input id="_IDGenInput3" value="{/Category}"/>
-                    
-                    <Label id="_IDGenLabel19" text="{i18n>typeCodeLabel}" required="true" labelFor="inputTypeCode"/>
-                    <Input id="inputTypeCode" value="{/TypeCode}"/>
-
-                    <Label id="_IDGenLabel20" text="{i18n>supplierIdLabel}" required="true" labelFor="inputSupplierId"/>
-                    <Input id="inputSupplierId" value="{/SupplierID}"/>
-
-                    <Label id="_IDGenLabel21" text="{i18n>taxTarifCodeLabel}" required="true" labelFor="inputTaxTarifCode"/>
-                    <Input id="inputTaxTarifCode" value="{/TaxTarifCode}" type="Number"/>
-
-                    <Label id="_IDGenLabel22" text="{i18n>measureUnitLabel}" required="true" labelFor="inputMeasureUnit"/>
-                    <Input id="inputMeasureUnit" value="{/MeasureUnit}"/>
+                    <Label id="_IDGenLabel7" text="{i18n>productIdLabel}" required="true"/>
+                    <Input id="_IDGenInput1" value="{/ProductID}" enabled="false" />
+                    <Label id="_IDGenLabel8" text="{i18n>productNameLabel}" required="true"/>
+                    <Input id="_IDGenInput2" value="{/Name}" />
+                    <Label id="_IDGenLabel9" text="{i18n>priceLabel}" required="true"/>
+                    <Input id="_IDGenInput3" value="{/Price}" type="Number"/>
+                    <Label id="_IDGenLabel10" text="{i18n>currencyLabel}" required="true"/>
+                    <Select id="currencySelect" selectedKey="{/CurrencyCode}">
+                        <items>
+                            <core:Item id="_IDGenItem" key="EUR" text="EUR" />
+                            <core:Item id="_IDGenItem1" key="USD" text="USD" />
+                        </items>
+                    </Select>
+                    <Label id="_IDGenLabel11" text="{i18n>descriptionLabel}"/>
+                    <Input id="_IDGenInput4" value="{/Description}"/>
+                    <Label id="_IDGenLabel17" text="{i18n>categoryLabel}" required="true"/>
+                    <Input id="_IDGenInput5" value="{/Category}"/>
+                    <Label id="_IDGenLabel18" text="{i18n>typeCodeLabel}" required="true"/>
+                    <Input id="_IDGenInput6" value="{/TypeCode}"/>
+                    <Label id="_IDGenLabel19" text="{i18n>supplierIdLabel}" required="true"/>
+                    <Input id="_IDGenInput7" value="{/SupplierID}"/>
+                    <Label id="_IDGenLabel20" text="{i18n>taxTarifCodeLabel}" required="true"/>
+                    <Input id="_IDGenInput8" value="{/TaxTarifCode}" type="Number"/>
+                    <Label id="_IDGenLabel21" text="{i18n>measureUnitLabel}" required="true"/>
+                    <Input id="_IDGenInput9" value="{/MeasureUnit}"/>
+                    <Label id="_IDGenLabel22" text="Created At"/>
+                    <DatePicker id="_IDGenDatePicker" value="{path: '/CreatedAt', type: 'sap.ui.model.type.Date'}" />
                 </layout:content>
             </layout:SimpleForm>
         </content>
         <beginButton>
-            <Button id="_IDGenButton3" text="{i18n>saveButton}" press=".onSaveProduct" type="Emphasized"/>
+            <Button id="_IDGenButton2" text="{i18n>saveButton}" press=".onSaveProduct" type="Emphasized"/>
         </beginButton>
         <endButton>
-            <Button id="_IDGenButton5" text="{i18n>cancelButton}" press=".onCloseDialog"/>
+            <Button id="_IDGenButton3" text="{i18n>cancelButton}" press=".onCloseDialog"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

@@ -18,7 +18,7 @@
             </Switch>
         </HBox>
         <content>
-            <Table id="productsTable" items="{/ProductSet}">
+            <Table id="productsTable" items="{/ProductSet}" growing="true" growingThreshold="20" >
                 <columns>
                     <Column id="checkboxColumn" width="5em">
                         <Text id="_IDGenText" text="#" />
@@ -61,14 +61,7 @@
                     </ColumnListItem>
                 </items>
             </Table>
-            <HBox id="paginationBox" alignItems="Center" justifyContent="SpaceBetween">
-                <Text id="rangeText" text="{viewModel>/rangeText}" />
-                <HBox id="_IDGenHBox">
-                    <Button id="prevButton" text="Previous" press=".onPreviousPage" enabled="{viewModel>/prevEnabled}" />
-                    <Text id="pageText" text="Page {viewModel>/currentPage} of {viewModel>/totalPages}" />
-                    <Button id="nextButton" text="Next" press=".onNextPage" enabled="{viewModel>/nextEnabled}" />
-                </HBox>
-            </HBox>
+            
         </content>
     </Page>
 </mvc:View>
