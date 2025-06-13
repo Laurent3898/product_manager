@@ -45,12 +45,6 @@ sap.ui.define(
           Device.orientation.attachHandler(this.onOrientationChange.bind(this));
         },
 
-        isSelected: function (sId) {
-          const oSelectedProducts =
-            this.oViewModel.getProperty("/selectedProducts") || {};
-          return !!oSelectedProducts[sId];
-        },
-
         rebindTable: function (aFilters = []) {
           const oTable = this.byId("productsTable");
           const oTemplate = oTable.getBindingInfo("items").template;
@@ -76,18 +70,6 @@ sap.ui.define(
               },
             },
           });
-        },
-
-        onCheckboxSelect: function (oEvent) {
-          const oCheckBox = oEvent.getSource();
-          const sProductId = oCheckBox
-            .getBindingContext()
-            .getProperty("ProductID");
-          const bSelected = oEvent.getParameter("selected");
-          const oSelectedProducts =
-            this.oViewModel.getProperty("/selectedProducts") || {};
-          oSelectedProducts[sProductId] = bSelected;
-          this.oViewModel.setProperty("/selectedProducts", oSelectedProducts);
         },
 
         onLiveSearch: function (oEvent) {

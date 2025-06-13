@@ -20,9 +20,6 @@
         <content>
             <Table id="productsTable" items="{/ProductSet}" growing="true" growingThreshold="20" >
                 <columns>
-                    <Column id="checkboxColumn" width="5em">
-                        <Text id="_IDGenText" text="#" />
-                    </Column>
                     <Column id="nameColumn">
                         <Text id="_IDGenText1" text="{i18n>productNameID}" />
                     </Column>
@@ -45,7 +42,6 @@
                 <items>
                     <ColumnListItem id="_IDGenColumnListItem1" type="Navigation">
                         <cells>
-                            <CheckBox id="_IDGenCheckBox" selected="{path: 'ProductID', formatter: '.isSelected'}" select=".onCheckboxSelect" />
                             <ObjectIdentifier id="_IDGenObjectIdentifier" title="{ProductID}" text="{Name}" />
                             <Text id="_IDGenText7" text="{Description}" />
                             <Text id="_IDGenText8" text="{Price}" />
