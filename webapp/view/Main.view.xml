@@ -8,6 +8,7 @@
                 <CheckBox id="includeSupplier" text="Include Supplier" select=".onSupplierToggle" selected="{viewModel>/includeSupplier}" />
                 <Button id="idBtnRefresh" press="onPressRefresh" text="Refresh"/>
                 <Button id="createNewProduct"  type="Emphasized" icon="sap-icon://add"  text="{i18n>createNewProduct}" press=".onCreateProduct" />
+                <Button id="statisticsButton" icon="sap-icon://bar-chart" text="{i18n>statisticsButton}" press=".onPressStatistics" />
             </OverflowToolbar>
         </subHeader>
         <HBox id="_IDGenHBox1">

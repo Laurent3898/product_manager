@@ -1,0 +1,81 @@
+<mvc:View
+    height="100%"
+    controllerName="com.market.m.productmanager.controller.Statistics"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:viz="sap.viz.ui5.controls"
+    >
+    <Page id="_IDGenPage"
+        title="{i18n>statisticsTitle}"
+        showNavButton="true"
+        navButtonPress=".onNavBack"
+        enableScrolling="true">
+        <content>
+            <!-- Tiles pour les statistiques clés -->
+            <FlexBox id="_IDGenFlexBox"
+                direction="Row"
+                wrap="Wrap"
+                alignItems="Start"
+                justifyContent="SpaceAround"
+                class="sapUiSmallMargin">
+                <items>
+                    <GenericTile id="_IDGenGenericTile"
+                        header="{i18n>totalProducts}"
+                        subheader="{i18n>totalProductsSubheader}"
+                        tooltip="{i18n>totalProducts}">
+                        <TileContent id="_IDGenTileContent">
+                            <NumericContent id="_IDGenNumericContent"
+                                value="{stats>/totalProducts}"
+                                icon="sap-icon://product"/>
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile id="_IDGenGenericTile1"
+                        header="{i18n>uniqueCategories}"
+                        subheader="{i18n>uniqueCategoriesSubheader}"
+                        tooltip="{i18n>uniqueCategories}">
+                        <TileContent id="_IDGenTileContent1">
+                            <NumericContent id="_IDGenNumericContent1"
+                                value="{stats>/uniqueCategories}"
+                                icon="sap-icon://tag"/>
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile id="_IDGenGenericTile2"
+                        header="{i18n>uniqueSuppliers}"
+                        subheader="{i18n>uniqueSuppliersSubheader}"
+                        tooltip="{i18n>uniqueSuppliers}">
+                        <TileContent id="_IDGenTileContent2">
+                            <NumericContent id="_IDGenNumericContent2"
+                                value="{stats>/uniqueSuppliers}"
+                                icon="sap-icon://supplier"/>
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile id="_IDGenGenericTile3"
+                        header="{i18n>averagePrice}"
+                        subheader="{i18n>averagePriceSubheader}"
+                        tooltip="{i18n>averagePrice}">
+                        <TileContent id="_IDGenTileContent3">
+                            <NumericContent id="_IDGenNumericContent3"
+                                value="{stats>/averagePrice}"
+                                icon="sap-icon://money-bills"/>
+                        </TileContent>
+                    </GenericTile>
+                </items>
+            </FlexBox>
+            <FlexBox
+            id="tileContainer"
+            justifyContent="Center"
+            alignItems="Center"
+            wrap="Wrap">
+        </FlexBox>
+
+        <viz:VizFrame id="vizFrame" vizType="column" width="100%" height="400px"/>
+        </content>
+
+        <footer>
+            <Toolbar id="_IDGenToolbar1">
+                <ToolbarSpacer id="_IDGenToolbarSpacer"/>
+                <Button id="_IDGenButton5" text="{i18n>refreshButton}" press=".onRefreshPress"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

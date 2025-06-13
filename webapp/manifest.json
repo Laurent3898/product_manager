@@ -49,7 +49,8 @@
       "minUI5Version": "1.84.14",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.viz": {}
       }
     },
     "contentDensities": {
@@ -101,6 +102,11 @@
           "name": "RouteProductNotFound",
           "pattern": "ProductNotFound",
           "target": ["TargetProductNotFound"]
+        },
+        {
+          "name": "RouteStatistics",
+          "pattern": "statistics",
+          "target": "TargetStatistics"
         }
       ],
       "targets": {
@@ -120,6 +126,11 @@
           "viewType": "XML",
           "viewId": "ProductNotFound",
           "viewName": "ProductNotFound"
+        },
+        "TargetStatistics": {
+          "viewType": "XML",
+          "viewId": "Statistics",
+          "viewName": "Statistics"
         }
       }
     },

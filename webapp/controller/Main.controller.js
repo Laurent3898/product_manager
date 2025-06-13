@@ -373,6 +373,10 @@ sap.ui.define(
           const sProductId = oItem.getBindingContext().getProperty("ProductID");
           this.getRouter().navTo("RouteProduct", { productId: sProductId });
         },
+
+        onPressStatistics: function () {
+          this.getRouter().navTo("RouteStatistics");
+        },
       }
     );
   }
